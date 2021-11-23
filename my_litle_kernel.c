@@ -71,13 +71,19 @@ static  int spawn(char * command) {  // spawn new process, loaded but not launch
         return p;
 }
 
+static int mlk_clock() { // return clock for process
+        return P[cp].clock + clock()-P[cp].lclock;
+}
 static void system_call() {
         int r;
         switch (system_call_ctx->number) {
                 case 1: r=spawn(system_call_ctx->u.s);
                         system_call_ctx->result=r;
                         break;
-                default: system_call_ctx->result=-1;
+                case 2: r=mlk_clock();
+                        system_call_ctx->result=r;
+                        break;
+               default: system_call_ctx->result=-1;
         }
 }
 

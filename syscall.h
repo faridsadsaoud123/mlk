@@ -27,4 +27,11 @@ int spawn(char *c) {
         kill(getpid(),SIGUSR1);
         return scc.result;
 }
+
+int mlk_clock() {
+        scc.number=2;
+        system_call_ctx=&scc;
+        kill(getpid(),SIGUSR1);
+        return scc.result;
+}
 #endif

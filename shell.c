@@ -9,7 +9,7 @@ int main() {
 	i=spawn("./foo.so");
 	printf("./foo.so lance : %d\n",i);
 	while (1) {
-	      printf("shell\n");
+	      printf("shell %d\n",mlk_clock());
 	      for (i=0;i<100000000;i++);
 	  }
 
