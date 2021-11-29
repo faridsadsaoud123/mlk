@@ -34,4 +34,12 @@ int mlk_clock() {
         kill(getpid(),SIGUSR1);
         return scc.result;
 }
+
+int mlk_sleep(int s) {
+        scc.number=3;
+        scc.u.i=s;
+        system_call_ctx=&scc;
+        kill(getpid(),SIGUSR1);
+        return scc.result;
+}
 #endif

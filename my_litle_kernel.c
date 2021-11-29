@@ -19,10 +19,12 @@ int nb_process=0;
 static struct PCB { // Process Context Block 
         ucontext_t uc; // context of process
         char *stack;   // stack of process
+        int ppid;      // Parent process
         clock_t clock; // total clock time 
         clock_t lclock; // clock value before process is scheduled
         int quantum; // quantum for the process
         scc_t *scc; // system call context
+        struct timeval alarm;
 } P[100];
 
 
@@ -67,13 +69,19 @@ static  int spawn(char * command) {  // spawn new process, loaded but not launch
         }
         P[p].uc.uc_link=&P[0].uc; // when process finish, go back to scheduler
         makecontext(&P[p].uc,principal,0);
-	//        dlclose(handle);
         return p;
 }
 
 static int mlk_clock() { // return clock for process
         return P[cp].clock + clock()-P[cp].lclock;
 }
+
+static int mlk_sleep(int s) {
+        gettimeofday(&P[cp].alarm,NULL);
+        P[cp].alarm.tv_sec+=s;
+        return 0;
+}
+
 static void system_call() {
         int r;
         switch (system_call_ctx->number) {
@@ -83,16 +91,22 @@ static void system_call() {
                 case 2: r=mlk_clock();
                         system_call_ctx->result=r;
                         break;
+                case 3: r=mlk_sleep(system_call_ctx->u.i);
+                        system_call_ctx->result=r;
+                        break;
                default: system_call_ctx->result=-1;
         }
 }
 
 
 static int choose_next_process() { // RR(1)
+        struct timeval tv;
         if (!nb_process) return -1;
-        int p=cp%nb_process+1; 
-        P[p].quantum=1;
-        return p;
+        int p=cp%nb_process;
+        gettimeofday(&tv,NULL);
+        while (P[p+1].alarm.tv_sec>tv.tv_sec)  p=(p+1)%nb_process;
+        P[p+1].quantum=1;
+        return p+1;
 }
 
 static void scheduler() {

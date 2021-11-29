@@ -10,7 +10,8 @@ int main() {
 	printf("./foo.so lance : %d\n",i);
 	while (1) {
 	      printf("shell %d\n",mlk_clock());
-	      for (i=0;i<100000000;i++);
+	      //for (i=0;i<100000000;i++);
+	      mlk_sleep(10);
 	  }
 
 }
