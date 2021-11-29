@@ -22,6 +22,7 @@ static struct PCB { // Process Context Block
         int ppid;      // Parent process
         clock_t clock; // total clock time 
         clock_t lclock; // clock value before process is scheduled
+        clock_t qclock; // clock time used during scheduled time
         int quantum; // quantum for the process
         scc_t *scc; // system call context
         struct timeval alarm;
@@ -144,7 +145,7 @@ void sig_handler(int s, siginfo_t *si, void* uctx) {
     write(0,"SIGNAL IN SCHEDULER !!!!\n",15);
     exit(EXIT_FAILURE);
   }
-  P[cp].clock+=clock()-P[cp].lclock;  // update process time
+  P[cp].clock+=(P[cp].qclock=clock()-P[cp].lclock);  // update process time
   if (s==SIGUSR1) {
         P[cp].scc=system_call_ctx;
         system_call();
@@ -189,7 +190,7 @@ int main()
                 fprintf(stderr, "sigaction error\n");
                 exit(EXIT_FAILURE);
         }
-
+        printf("Kernel Information : there is %d clock per second\n",CLOCKS_PER_SEC);
         spawn("./shell.so");
         scheduler();
 	
