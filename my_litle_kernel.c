@@ -190,8 +190,8 @@ int main()
                 fprintf(stderr, "sigaction error\n");
                 exit(EXIT_FAILURE);
         }
-        printf("Kernel Information : there is %d clock per second\n",CLOCKS_PER_SEC);
-        spawn("./shell.so");
+        printf("Kernel Information : there is %lu clock per second\n",CLOCKS_PER_SEC);
+        spawn("./init.so");
         scheduler();
 	
         exit(EXIT_SUCCESS);

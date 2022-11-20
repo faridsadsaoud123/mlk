@@ -1,4 +1,4 @@
-all: mlk shell.so foo.so bar.so
+all: mlk init.so foo.so bar.so
 
 mlk : my_litle_kernel.c scc.so syscall.h
 	gcc -Wno-deprecated my_litle_kernel.c scc.so -ldl -o mlk
