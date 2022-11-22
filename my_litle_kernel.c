@@ -104,8 +104,8 @@ static int choose_next_process() { // RR(1)
         struct timeval tv;
         if (!nb_process) return -1;
         int p=cp%nb_process;
-        gettimeofday(&tv,NULL);
-        while (P[p+1].alarm.tv_sec>tv.tv_sec)  p=(p+1)%nb_process;
+        while (gettimeofday(&tv,NULL),P[p+1].alarm.tv_sec>tv.tv_sec) p=(p+1)%nb_process;
+;
         P[p+1].quantum=1;
         return p+1;
 }
