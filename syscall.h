@@ -42,4 +42,12 @@ int mlk_sleep(int s) {
         kill(getpid(),SIGUSR1);
         return scc.result;
 }
+
+int mlk_getpid() {
+        scc.number=4;
+        system_call_ctx=&scc;
+        kill(getpid(),SIGUSR1);
+        return scc.result;
+}
+
 #endif

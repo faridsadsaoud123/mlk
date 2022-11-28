@@ -83,6 +83,10 @@ static int mlk_sleep(int s) {
         return 0;
 }
 
+static int mlk_getpid() {
+  return cp;
+}
+
 static void system_call() {
         int r;
         switch (system_call_ctx->number) {
@@ -95,6 +99,9 @@ static void system_call() {
                 case 3: r=mlk_sleep(system_call_ctx->u.i);
                         system_call_ctx->result=r;
                         break;
+                case 4: r=mlk_getpid();
+                        system_call_ctx->result=r;
+                        break;			
                default: system_call_ctx->result=-1;
         }
 }

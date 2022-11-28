@@ -7,7 +7,9 @@ int main() {
 	i=spawn("./bar.so");
 	printf("./bar.so lance : %d\n",i);
 	i=spawn("./foo.so");
-	printf("./foo.so lance : %d\n",i);
+	printf("./foo.so lance : %d\n",i);	
+	i=spawn("./foo.so");
+	printf("./foo.so lance 2: %d\n",i);	
 	while (1) {
 	      printf("init %d\n",mlk_clock());
 	      //for (i=0;i<100000000;i++);
