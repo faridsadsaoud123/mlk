@@ -6,7 +6,7 @@ struct SCC { // System Call Context
         union {
                 char * s;
                 int i;
-
+                int p;
         } u;
         int result;
 }; // process fill a SCC struct and set pointer before syscall
@@ -49,5 +49,43 @@ int mlk_getpid() {
         kill(getpid(),SIGUSR1);
         return scc.result;
 }
+int mlkprint(char* s){
+        scc.u.s= s;
+        scc.number=5;
+        system_call_ctx=&scc;
+        kill(getpid(),SIGUSR1);
+        return scc.result;
+}
+int mlk_wait(){
+        scc.number=6;
+        system_call_ctx=&scc;
+        kill(getpid(),SIGUSR1);
+        return scc.result;
+}
+int mlk_signal(int p){
+        scc.u.i=p;
+        scc.number=7;
+        system_call_ctx=&scc;
+        kill(getpid(),SIGUSR1);
+        return scc.result;
+}
+
+int mlk_send(char* msg,int l, int p){
+        scc.u.s=msg;
+        scc.u.p=p;
+        scc.number=8;
+        system_call_ctx=&scc;
+        kill(getpid(),SIGUSR1);
+        return scc.result;
+}
+int mlk_recv(char* buff, int l){
+        scc.u.s=buff;
+        scc.number=9;
+        system_call_ctx=&scc;
+        kill(getpid(),SIGUSR1);
+        return scc.result;
+}
+
+
 
 #endif

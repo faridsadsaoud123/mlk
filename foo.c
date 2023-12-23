@@ -5,10 +5,10 @@
 void main() {
   int i=0,r;
   while (1) {
-    printf("foo %d %d\n",mlk_clock(),mlk_getpid());
+    // printf("foo %d %d\n",mlk_clock(),mlk_getpid());
     for (i=0;i<100000;i++);
-    r=rand()%5+1;
+    r=rand()%6+1;
     mlk_sleep(r);
+    mlkprint("farid");
     }
 }
-

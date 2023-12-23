@@ -1,3 +1,8 @@
+
+
+// Realise par Zouaoui Mohamed Cherif 22313975
+//, et SAD SAOUD Farid 22312283
+// Groupe1
 #define _XOPEN_SOURCE 500
 #define MY_LITLE_KERNEL
 #include <unistd.h>
@@ -9,8 +14,8 @@
 #include <sys/time.h>
 #include <time.h>
 #include "syscall.h"
-
-
+#include <sys/wait.h>
+// #include <semaphore>
 #define MAX_PROCESS 99
 int cp=0;           // current process number running
 int nb_process=0;
@@ -26,7 +31,13 @@ static struct PCB { // Process Context Block
         int quantum; // quantum for the process
         scc_t *scc; // system call context
         struct timeval alarm;
+        int waiting;
+        void* msg;
+        int from,to,len,sendrecv;
 } P[100];
+static struct sema_t{
+        int n;
+}sema_t;
 
 
 
@@ -87,6 +98,61 @@ static int mlk_getpid() {
   return cp;
 }
 
+static int mlkprint(char* s){
+        printf("bonjour ---- %s\n",s);
+}
+
+// Fonction mlk_wait
+int mlk_wait() {
+    
+        P[cp].waiting=1;
+        return 0;
+}
+
+// Fonction mlk_signal
+int mlk_signal(int p) {
+
+    P[p].waiting=0;
+    return 0;
+}
+
+int mlk_send(void* mesg,int l, int p){
+        if (P[cp].from==-1)
+        {
+                mlk_wait();
+        }
+        else{
+                P[p].from=-1;
+                mlkprint("message envoye\n");
+
+        }
+        
+}
+int mlk_recv(void* buff, int l){
+        if(P[cp].from==-1){
+                mlk_wait();
+        }
+        else{
+                P[P[cp].from].to=-1;
+                mlkprint("Message recu\n");
+        }
+}
+sema_t sema_create(int n) {
+        sema_t s;
+        s.n=n;
+        return s;
+}
+sema_wait(sema_t s) {
+        if(s.n==0){
+                mlk_wait();
+        }
+        else{
+                s.n=s.n-1;
+        }
+}
+sema_post(sema_t s) {
+        
+}
 static void system_call() {
         int r;
         switch (system_call_ctx->number) {
@@ -101,7 +167,22 @@ static void system_call() {
                         break;
                 case 4: r=mlk_getpid();
                         system_call_ctx->result=r;
-                        break;			
+                        break;
+                case 5: r=mlkprint(system_call_ctx->u.s);
+                        system_call_ctx->result=r;
+                        break;	
+                case 6: r=mlk_wait();
+                        system_call_ctx->result=r;
+                        break;
+                case 7: r=mlk_signal();
+                        system_call_ctx->result=r;
+                        break;
+                case 8: r=mlk_send();
+                        system_call_ctx->result=r;
+                        break;
+                case 9: r=mlk_recv();
+                        system_call_ctx->result=r;
+                        break;
                default: system_call_ctx->result=-1;
         }
 }
@@ -111,8 +192,7 @@ static int choose_next_process() { // RR(1)
         struct timeval tv;
         if (!nb_process) return -1;
         int p=cp%nb_process;
-        while (gettimeofday(&tv,NULL),P[p+1].alarm.tv_sec>tv.tv_sec) p=(p+1)%nb_process;
-;
+        while (gettimeofday(&tv,NULL),P[p+1].alarm.tv_sec>tv.tv_sec && P[p+1].waiting) p=(p+1)%nb_process;
         P[p+1].quantum=1;
         return p+1;
 }
